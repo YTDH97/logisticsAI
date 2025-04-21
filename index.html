@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>物流方案智选顾问</title>
+  <style>
+    body {
+      font-family: "Microsoft YaHei", sans-serif;
+      background: linear-gradient(to bottom, #f0f4f7, #ffffff);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 30px 16px;
+      color: #333;
+    }
+    h1 {
+      color: #00796b;
+      margin-bottom: 12px;
+      font-size: 24px;
+    }
+    .chat-box {
+      width: 100%;
+      max-width: 480px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 16px;
+      margin-top: 20px;
+    }
+    .chat-box textarea {
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: none;
+      font-size: 14px;
+    }
+    .chat-box button {
+      background-color: #00796b;
+      color: #fff;
+      padding: 10px 20px;
+      margin-top: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .chat-box button:hover {
+      background-color: #004d40;
+    }
+    .response {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <h1>物流方案智选顾问</h1>
+  <p>输入你的物流问题，我们将提供多种运输方案并推荐最优选项：</p>
+  <div class="chat-box">
+    <textarea id="question" placeholder="例如：从广州发冷藏货到成都，怎么运最划算？"></textarea>
+    <button onclick="askGPT()">获取方案</button>
+    <div class="response" id="response"></div>
+  </div>
+
+  <script>
+    async function askGPT() {
+      const question = document.getElementById("question").value;
+      const responseDiv = document.getElementById("response");
+      responseDiv.innerText = "加载中...";
+      const prompt = `你是一个专业的物流运输咨询顾问，客户会向你提问运输方案或询价问题。请根据问题提供至少三种运输方案，并在最后推荐一种最优方案，说明推荐理由。\n\n用户问题：${question}`;
+
+      const result = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer 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"
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [{ role: "system", content: "你是一个物流顾问" }, { role: "user", content: prompt }]
+        })
+      });
+
+      const data = await result.json();
+      const reply = data.choices?.[0]?.message?.content || "请求失败，请稍后重试。";
+      responseDiv.innerText = reply;
+    }
+  </script>
+</body>
+</html>
